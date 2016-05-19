@@ -39,22 +39,16 @@ def clientthread(conn):
         # Receiving from client
         data = conn[1].recv(1024)
         while data:
-            if data:
-                reply = 'client2 : ' + data
-                conn[0].sendall(reply)
+            reply = 'client2 : ' + data
+            conn[0].sendall(reply)
             data=conn[1].recv(1024)
-            if not data:
-                break
-
+        
         data=conn[0].recv(1024)
         while data:
-            if data:
-                reply='client1 : ' + data
-                conn[1].sendall(reply)
+            reply='client1 : ' + data
+            conn[1].sendall(reply)
             data=conn[0].recv(1024)
-            if not data:
-                break
-
+            
 
     # came out of loop
     conn[0].close()
