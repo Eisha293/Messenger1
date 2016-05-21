@@ -20,7 +20,8 @@ except socket.error as msg:
     sys.exit()
 
 print 'Socket bind complete'
-
+arr=[]
+i=0
 # Start listening on socket
 s.listen(2)
 print 'Socket now listening'
@@ -30,39 +31,31 @@ addr={}
 # Function for handling connections. This will be used to create threads
 def clientthread(conn):
     # Sending message to connected client
-    conn[0].send('Welcome to the server. Type something and hit enter\n')  # send only takes string
-    conn[1].send('Welcome to the server. Type something and hit enter\n')
-
+    conn.send('Welcome to the server. Type something and hit enter\n')  # send only takes string
+   
     # infinite loop so that function do not terminate and thread do not end.
     while True:
 
         # Receiving from client
         data = conn[1].recv(1024)
         while data:
-            reply = 'client2 : ' + data
-            conn[0].sendall(reply)
-            data=conn[1].recv(1024)
-        
-        data=conn[0].recv(1024)
-        while data:
-            reply='client1 : ' + data
-            conn[1].sendall(reply)
-            data=conn[0].recv(1024)
-            
-
+            data=conn.recv(1024)
+            reply=data 
+            if not data: break
+            if conn==arr[0]:
+                arr[1].sendall(reply)
+            else:
+                arr[0].sendall(reply)
     # came out of loop
-    conn[0].close()
-    conn[1].close()
-
+    conn.close()
+    
 # now keep talking with the client
 while 1:
     # wait to accept a connection - blocking call
-    conn[0], addr[0] = s.accept()
-    print 'Connected with ' + addr[0][0] + ':' + str(addr[0][1])
-
-    conn[1], addr[1] = s.accept()
-    print 'Connected with ' + addr[1][0] + ':' + str(addr[1][1])
-
+    conn, addr = s.accept()
+    arr.append(conn)
+    print 'Connected with '
+    
     # start new thread takes 1st argument as a function name to be run, second is the tuple of arguments to the function.
     start_new_thread(clientthread, (conn,))
 
